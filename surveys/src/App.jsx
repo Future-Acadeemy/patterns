@@ -10,25 +10,16 @@ import SurveyForm from "./pages/SurveyForm";
 import Report from "./pages/Report";
 import DecisionMatrix from "./components/DecisionMatrix";
 import Home from "./components/Home";
+import Login from "./pages/Login";
 
 const App = () => {
   const [userInfo, setUserInfo] = useState(null);
 
   return (
-    // <Layout>
-    //   {!userInfo ? (
-    //     <UserInfoForm onSubmit={setUserInfo} />
-    //   ) : (
-    //     <Survey userInfo={userInfo} />
-    //   )}
-    //   {/* <Survey userInfo={userInfo} /> */}
-    // </Layout>
-    // <Registeration />
-    // <SurveyForm />
-
     <Router>
       <Routes>
-        <Route path="/" element={<Registeration />} />
+        <Route exact path="/" element={<Login />} />
+        <Route path="/registeration" element={<Registeration />} />{" "}
         <Route path="/home" element={<Home />} />
         <Route path="/survey" element={<SurveyForm />} />
         <Route path="/report" element={<Report />} />
