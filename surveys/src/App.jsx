@@ -16,8 +16,6 @@ import Login from "./pages/Login";
 const queryClient = new QueryClient(); // Create QueryClient instance
 
 const App = () => {
-  const [userInfo, setUserInfo] = useState(null);
-
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
