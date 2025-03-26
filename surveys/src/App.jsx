@@ -9,7 +9,6 @@ import Layout from "./layout/Layout";
 import Registeration from "./pages/Registeration";
 import SurveyForm from "./pages/SurveyForm";
 import Report from "./pages/Report";
-import DecisionMatrix from "./components/DecisionMatrix";
 import Home from "./components/Home";
 import Login from "./pages/Login";
 
@@ -25,7 +24,6 @@ const App = () => {
           <Route path="/home" element={<Home />} />
           <Route path="/survey" element={<SurveyForm />} />
           <Route path="/report" element={<Report />} />
-          <Route path="/decision" element={<DecisionMatrix />} />
         </Routes>
       </Router>
     </QueryClientProvider>
