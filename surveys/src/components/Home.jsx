@@ -11,23 +11,12 @@ const Home = () => {
       </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-3xl">
-        {/* Survey 1 */}
         <div
           className="bg-white p-6 rounded-lg shadow-lg cursor-pointer hover:bg-blue-100 transition"
-          onClick={() => navigate("/survey")}
+          onClick={() => navigate("/personality")}
         >
           <h2 className="text-2xl font-semibold text-gray-800 text-center">
-            Maslach Burnout Inventory (MBI)
-          </h2>
-        </div>
-
-        {/* Survey 2 */}
-        <div
-          className="bg-white p-6 rounded-lg shadow-lg cursor-pointer hover:bg-blue-100 transition"
-          onClick={() => navigate("/decision")}
-        >
-          <h2 className="text-2xl font-semibold text-gray-800 text-center">
-            Decision-Making Survey
+            Personality Survey
           </h2>
         </div>
       </div>
