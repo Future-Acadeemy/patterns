@@ -4,9 +4,12 @@ import { persist } from "zustand/middleware";
 export const useSurveyStore = create(
   persist(
     (set, get) => ({
+      phone: "", // Store user phone number
       answers: { A: [], B: [], C: [] }, // Initialize answers
       scores: { A: 0, B: 0, C: 0 }, // Store calculated scores
       showResult: false,
+
+      setPhone: (phone) => set({ phone }),
 
       setAnswer: (section, index, value) =>
         set((state) => {
@@ -32,6 +35,11 @@ export const useSurveyStore = create(
             },
           };
         }),
+
+      getSurveyData: () => {
+        const { phone, answers, scores } = get();
+        return { phone, answers, scores };
+      },
 
       setShowResult: (value) => set({ showResult: value }),
     }),

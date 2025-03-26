@@ -31,7 +31,7 @@ const useLogin = () => {
       );
       const { _id, createdAt, updatedAt, __v, ...userData } = profile.data;
       setUserInfo(userData);
-      navigate("/personality");
+      navigate("/survey");
     } catch (error) {
       setMessage(
         "Login failed: " + (error.response?.data?.message || error.message)
