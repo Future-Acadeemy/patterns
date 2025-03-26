@@ -40,11 +40,6 @@ const Survey = () => {
     {}
   );
 
-  const userInfoWithScores = {
-    ...userInfo,
-    scoresWithInterpretations,
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     updateScores();
