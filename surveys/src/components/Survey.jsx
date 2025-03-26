@@ -67,7 +67,7 @@ const Survey = () => {
   }, []);
 
   return (
-    <div className="w-full max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-lg">
+    <div className="w-full max-w-full mx-auto bg-white p-8 rounded-lg shadow-lg">
       <form className="space-y-8" onSubmit={handleSubmit}>
         {Object.entries(questions).map(([section, qs]) => (
           <div key={section} className="p-6 bg-gray-50 rounded-lg shadow-md">
