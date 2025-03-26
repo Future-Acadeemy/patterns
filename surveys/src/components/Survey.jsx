@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Result from "./Result";
 import { questions } from "../data/Questions";
 import { options } from "../data/Questions";
@@ -8,6 +8,7 @@ import { interpretations } from "../data/Questions";
 import { interpretScore } from "../services/Services";
 import { useUserStore } from "../store/useUserStore";
 import axios from "axios";
+import useSubmit from "../hooks/useSubmit";
 
 const Survey = () => {
   const {
@@ -17,11 +18,16 @@ const Survey = () => {
     setShowResult,
     scores,
     updateScores,
+    getSurveyData,
+    setPhone,
   } = useSurveyStore();
   const navigate = useNavigate();
   const { userInfo } = useUserStore();
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [validationError, setValidationError] = useState("");
+
+  const mutation = useSubmit();
 
   const scoresWithInterpretations = Object.entries(scores).reduce(
     (acc, [section, score]) => {
@@ -42,20 +48,28 @@ const Survey = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     updateScores();
+    const surveyData = getSurveyData();
+
     try {
-      const response = await axios.post(
-        "https://survey-backend.up.railway.app/api/users/call",
-        userInfoWithScores
-      );
-      setMessage(response.data.message);
+      await mutation.mutateAsync({
+        phone: surveyData.phone,
+        answers: surveyData.answers,
+        scores: surveyData.scores,
+      });
+      navigate("/report");
     } catch (error) {
-      setMessage("Error submitting data: " + error.message);
-      console.error("Submission error:", error);
-    } finally {
-      setLoading(false);
+      setValidationError("Submission failed. Please try again.");
     }
+
+    console.log("data:--> ", getSurveyData());
+
     navigate("/report");
   };
+
+  useEffect(() => {
+    setPhone(userInfo.phone);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="w-full max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-lg">
