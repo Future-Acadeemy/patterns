@@ -1,40 +1,147 @@
 import React from "react";
-import { useNormalSurveyStore } from "../store/useNormalSurveyStore"; // Updated import
+import { saveAs } from "file-saver";
+import { Document, Packer, Paragraph, TextRun } from "docx";
+import { useSurveyStore } from "../store/useSurveyStore";
+import { useUserStore } from "../store/useUserStore";
+import { questions, options } from "../data/Questions";
 import { interpretScore } from "../services/Services";
-import { useNavigate } from "react-router-dom";
-
-// Personality trait descriptions
-const traitDescriptions = {
-  E: "Extroversion (E) is the personality trait of seeking fulfillment from sources outside the self or in community. High scorers tend to be very social, while low scorers prefer to work on their projects alone.",
-  A: "Agreeableness (A) reflects how much individuals adjust their behavior to suit others. High scorers are typically polite and like people. Low scorers tend to 'tell it like it is'.",
-  C: "Conscientiousness (C) is the personality trait of being honest and hardworking. High scorers tend to follow rules and prefer clean homes. Low scorers may be messy and cheat others.",
-  N: "Neuroticism (N) is the personality trait of being emotional.",
-  O: "Openness to Experience (O) is the personality trait of seeking new experiences and intellectual pursuits. High scorers may daydream a lot. Low scorers may be very down-to-earth.",
-};
 
 const Result = () => {
-  const { scores } = useNormalSurveyStore(); // Use the correct store
-  const navigate = useNavigate();
+  const { answers, scores } = useSurveyStore();
+  const user = useUserStore((state) => state);
+  const userInfo = user.userInfo;
+
+  const generateWordFile = async () => {
+    const doc = new Document({
+      sections: [
+        {
+          children: [
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: "Maslach Burnout Inventory (MBI) Results",
+                  bold: true,
+                  size: 32,
+                }),
+              ],
+              spacing: { after: 300 },
+            }),
+            new Paragraph({ text: "" }),
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: "User Information",
+                  bold: true,
+                  size: 28,
+                }),
+              ],
+              spacing: { after: 200 },
+            }),
+            ...Object.entries(userInfo).map(
+              ([key, value]) =>
+                new Paragraph({
+                  children: [
+                    new TextRun({
+                      text: `${
+                        key.charAt(0).toUpperCase() + key.slice(1)
+                      }: ${value}`,
+                      size: 24,
+                    }),
+                  ],
+                  spacing: { after: 150 },
+                })
+            ),
+            new Paragraph({ text: "" }),
+            new Paragraph({
+              children: [
+                new TextRun({ text: "Results", bold: true, size: 28 }),
+              ],
+              spacing: { after: 200 },
+            }),
+            ...Object.entries(scores).map(
+              ([section, score]) =>
+                new Paragraph({
+                  children: [
+                    new TextRun({
+                      text: `Section ${section}: ${score} (${interpretScore(
+                        section,
+                        score
+                      )})`,
+                      size: 22,
+                    }),
+                  ],
+                  spacing: { after: 200 },
+                })
+            ),
+            new Paragraph({ text: "" }),
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: "Survey Questions and Answers",
+                  bold: true,
+                  size: 28,
+                }),
+              ],
+              spacing: { after: 200 },
+            }),
+            ...Object.entries(questions).flatMap(([section, qs]) =>
+              qs.map((q, index) => {
+                const answerValue = answers[section][index];
+                const answerLabel =
+                  options.find((option) => option.value === answerValue)
+                    ?.label || "Not answered";
+
+                return new Paragraph({
+                  children: [
+                    new TextRun({
+                      text: `Q${index + 1}: ${q}`,
+                      size: 22,
+                    }),
+                    new TextRun({
+                      text: `\nAnswer: ${answerLabel}`,
+                      italics: true,
+                      size: 22,
+                    }),
+                  ],
+                  spacing: { after: 200 },
+                });
+              })
+            ),
+          ],
+        },
+      ],
+    });
+
+    const blob = await Packer.toBlob(doc);
+    saveAs(blob, "MBI_Results.docx");
+  };
 
   return (
-    <div className="p-4 bg-white shadow rounded">
-      <h2 className="font-bold text-lg mb-4">Results</h2>
-      {Object.entries(scores).map(([section, score]) => (
-        <div key={section} className="mb-4 p-4 border rounded">
-          <p className="text-gray-700">
-            Score: <span className="font-semibold">{score}</span>
-          </p>
-          <p className="text-gray-600 italic">{traitDescriptions[section]}</p>
-        </div>
-      ))}
-      <div className="flex space-x-4">
-        {/* <button
-          className="mt-4 bg-gray-500 text-white px-8 py-4 rounded text-lg"
-          onClick={() => navigate("/home")}
-        >
-          Back to Home Page
-        </button> */}
+    <div className="p-8 bg-white shadow-lg rounded-lg max-w-4xl mx-auto mt-10">
+      <h2 className="font-bold text-2xl text-gray-800 text-center mb-6">
+        Results
+      </h2>
+
+      <div className="mt-6 rounded-lg p-4 bg-gray-50">
+        <ul className="mt-2 space-y-2">
+          {Object.entries(scores).map(([section, score]) => (
+            <li key={section} className="text-gray-700">
+              <span className="font-semibold">Section {section}:</span> {score}
+              <span className="text-sm text-gray-500">
+                {" "}
+                ({interpretScore(section, score)})
+              </span>
+            </li>
+          ))}
+        </ul>
       </div>
+
+      <button
+        className="mt-6 w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 rounded-lg transition-all"
+        onClick={generateWordFile}
+      >
+        Download Report
+      </button>
     </div>
   );
 };
