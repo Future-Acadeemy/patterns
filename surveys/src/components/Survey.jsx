@@ -9,6 +9,7 @@ import { interpretScore } from "../services/Services";
 import { useUserStore } from "../store/useUserStore";
 import axios from "axios";
 import useSubmit from "../hooks/useSubmit";
+import { useTranslation } from "react-i18next";
 
 const Survey = () => {
   const {
@@ -23,6 +24,8 @@ const Survey = () => {
   } = useSurveyStore();
   const navigate = useNavigate();
   const { userInfo } = useUserStore();
+  const { t, i18n } = useTranslation();
+
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [validationError, setValidationError] = useState("");
@@ -71,19 +74,21 @@ const Survey = () => {
       <form className="space-y-8" onSubmit={handleSubmit}>
         {Object.entries(questions).map(([section, qs]) => (
           <div key={section} className="p-6 bg-gray-50 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold mb-4 text-blue-600">
-              Section {section}
+            <h2 className="text-xl font-semibold mb-4 text-blue-600 text-center">
+              {t("Section")} {t(section)}
             </h2>
             <table className="w-full border-collapse border border-gray-300 text-left">
               <thead>
                 <tr className="bg-blue-100">
-                  <th className="border border-gray-300 px-4 py-3">Question</th>
+                  <th className="border border-gray-300 px-4 py-3 text-center">
+                    {t("Question")}
+                  </th>
                   {options.map((option) => (
                     <th
                       key={option.value}
                       className="border border-gray-300 px-4 py-3 text-center"
                     >
-                      {option.label}
+                      {t(option.label)}
                     </th>
                   ))}
                 </tr>
@@ -91,7 +96,9 @@ const Survey = () => {
               <tbody>
                 {qs.map((q, index) => (
                   <tr key={index} className="hover:bg-gray-100">
-                    <td className="border border-gray-300 px-4 py-3">{q}</td>
+                    <td className="border border-gray-300 px-4 py-3 text-center">
+                      {t(q)}
+                    </td>
                     {options.map((option) => (
                       <td
                         key={option.value}
@@ -101,7 +108,7 @@ const Survey = () => {
                           type="radio"
                           name={`section-${section}-question-${index}`}
                           value={option.value}
-                          checked={answers[section][index] === option.value}
+                          checked={answers[section][index] === option?.value}
                           onChange={(e) =>
                             setAnswer(section, index, e.target.value)
                           }
