@@ -5,11 +5,13 @@ import { useSurveyStore } from "../store/useSurveyStore";
 import { useUserStore } from "../store/useUserStore";
 import { questions, options } from "../data/Questions";
 import { interpretScore } from "../services/Services";
+import { useTranslation } from "react-i18next";
 
 const Result = () => {
   const { answers, scores } = useSurveyStore();
   const user = useUserStore((state) => state);
   const userInfo = user.userInfo;
+  const { t, i18n } = useTranslation();
 
   const generateWordFile = async () => {
     const doc = new Document({
@@ -119,17 +121,20 @@ const Result = () => {
   return (
     <div className="p-8 bg-white shadow-lg rounded-lg max-w-4xl mx-auto mt-10">
       <h2 className="font-bold text-2xl text-gray-800 text-center mb-6">
-        Results
+        {t("Results")}
       </h2>
 
       <div className="mt-6 rounded-lg p-4 bg-gray-50">
         <ul className="mt-2 space-y-2">
           {Object.entries(scores).map(([section, score]) => (
             <li key={section} className="text-gray-700">
-              <span className="font-semibold">Section {section}:</span> {score}
+              <span className="font-semibold">
+                {t("Section")} {t(section)}:
+              </span>{" "}
+              {score}
               <span className="text-sm text-gray-500">
                 {" "}
-                ({interpretScore(section, score)})
+                {t(interpretScore(section, score))}
               </span>
             </li>
           ))}
@@ -140,7 +145,7 @@ const Result = () => {
         className="mt-6 w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 rounded-lg transition-all"
         onClick={generateWordFile}
       >
-        Download Report
+        {t("Download Report")}
       </button>
     </div>
   );
