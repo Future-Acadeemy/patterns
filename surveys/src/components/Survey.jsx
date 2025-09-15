@@ -31,7 +31,7 @@ const Survey = () => {
   const [validationError, setValidationError] = useState("");
 
   const mutation = useSubmit();
-  console.log("answers:: --> ", answers);
+  console.log("questions:: --> ", questions);
 
   const scoresWithInterpretations = Object.entries(scores).reduce(
     (acc, [section, score]) => {
