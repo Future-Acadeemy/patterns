@@ -1,37 +1,40 @@
 import React, { useEffect, useState } from "react";
-import {
-  leadershipQuestions,
-  frequencyOptions,
-  importanceOptions,
-} from "../data/Questions";
+import { personalAbilitiesQuestions, abilityOptions } from "../data/Questions";
 import { useSurveyStore } from "../store/useSurveyStore";
 import { useNavigate } from "react-router-dom";
 import { useUserStore } from "../store/useUserStore";
 import useSubmit from "../hooks/useSubmit";
 import { useTranslation } from "react-i18next";
 
-const Survey = () => {
-  const { t } = useTranslation(); // Translation hook
-  const { answers, setAnswer, calculateScores, setShowResult, getSurveyData } =
-    useSurveyStore();
+const AbilitiesSurvey = () => {
+  const { t } = useTranslation();
+  const {
+    phone,
+    setPhone,
+    answers,
+    setAnswer,
+    calculateScores,
+    getSurveyData,
+  } = useSurveyStore();
   const navigate = useNavigate();
   const { userInfo } = useUserStore();
 
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
   const [validationError, setValidationError] = useState("");
-  const [phoneInput, setPhoneInput] = useState("");
-
   const mutation = useSubmit();
 
+  // Initialize phone input from user info
   useEffect(() => {
-    if (userInfo.phone) setPhoneInput(userInfo.phone);
-  }, [userInfo.phone]);
+    if (userInfo.phone) setPhone(userInfo.phone);
+  }, [userInfo.phone, setPhone]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!phone) {
+      setValidationError(t("Please enter your phone number."));
+      return;
+    }
+
     calculateScores();
-    setShowResult(true);
 
     try {
       await mutation.mutateAsync(getSurveyData());
@@ -39,6 +42,7 @@ const Survey = () => {
     } catch (error) {
       setValidationError(t("Submission failed. Please try again."));
     }
+    navigate("/report");
 
     console.log("Survey Data:", getSurveyData());
   };
@@ -48,6 +52,7 @@ const Survey = () => {
       onSubmit={handleSubmit}
       className="p-6 bg-white shadow-lg rounded-3xl max-w-6xl mx-auto"
     >
+      {/* Survey Table */}
       <div className="overflow-x-auto">
         <table className="w-full border-separate border-spacing-0">
           <thead>
@@ -55,37 +60,10 @@ const Survey = () => {
               <th className="p-3 bg-blue-100 text-blue-700 font-semibold rounded-tl-xl border-b border-gray-200">
                 {t("Question")}
               </th>
-              <th
-                colSpan={3}
-                className="p-3 bg-blue-100 text-blue-700 font-semibold text-center border-b border-gray-200"
-              >
-                {t("Frequency")}
-              </th>
-              <th
-                colSpan={3}
-                className="p-3 bg-blue-100 text-blue-700 font-semibold text-center rounded-tr-xl border-b border-gray-200"
-              >
-                {t("Importance")}
-              </th>
-            </tr>
-            <tr className="bg-gray-50 text-gray-700">
-              <th></th>
-              {frequencyOptions.map((opt, idx) => (
+              {abilityOptions.map((opt) => (
                 <th
-                  key={`f-${opt.value}`}
-                  className={`p-2 border-b border-gray-200 text-center font-medium ${
-                    idx === frequencyOptions.length - 1
-                      ? "border-r-2 border-gray-400"
-                      : ""
-                  }`}
-                >
-                  {t(opt.label)}
-                </th>
-              ))}
-              {importanceOptions.map((opt) => (
-                <th
-                  key={`i-${opt.value}`}
-                  className="p-2 border-b border-gray-200 text-center font-medium"
+                  key={opt.value}
+                  className="p-3 bg-blue-100 text-blue-700 font-semibold text-center border-b border-gray-200"
                 >
                   {t(opt.label)}
                 </th>
@@ -93,47 +71,30 @@ const Survey = () => {
             </tr>
           </thead>
           <tbody>
-            {leadershipQuestions.map((q, index) => (
+            {personalAbilitiesQuestions.map((q, index) => (
               <tr
-                key={q.id}
+                key={index + 1}
                 className={`${
                   index % 2 === 0 ? "bg-white" : "bg-gray-50"
                 } hover:bg-blue-50 transition`}
               >
                 <td className="p-3 text-gray-800 font-medium border-b border-gray-200">
-                  {t(q.text)}
+                  {t(`${index + 1}. ${q}`)}
                 </td>
-                {frequencyOptions.map((opt, idx) => (
+                {abilityOptions.map((opt) => (
                   <td
-                    key={`freq-${q.id}-${opt.value}`}
-                    className={`p-2 text-center border-b border-gray-200 ${
-                      idx === frequencyOptions.length - 1
-                        ? "border-r-2 border-gray-400"
-                        : ""
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name={`freq-${q.id}`}
-                      value={opt.value}
-                      checked={answers[q.id]?.freq === opt.value}
-                      onChange={(e) => setAnswer(q.id, "freq", e.target.value)}
-                      className="accent-blue-500 w-5 h-5 cursor-pointer"
-                    />
-                  </td>
-                ))}
-                {importanceOptions.map((opt) => (
-                  <td
-                    key={`imp-${q.id}-${opt.value}`}
+                    key={`q${index + 1}-opt${opt.value}`}
                     className="p-2 text-center border-b border-gray-200"
                   >
                     <input
                       type="radio"
-                      name={`imp-${q.id}`}
+                      name={`q${index + 1}`}
                       value={opt.value}
-                      checked={answers[q.id]?.imp === opt.value}
-                      onChange={(e) => setAnswer(q.id, "imp", e.target.value)}
-                      className="accent-green-500 w-5 h-5 cursor-pointer"
+                      checked={answers[index + 1] === opt.value}
+                      onChange={(e) =>
+                        setAnswer(index + 1, Number(e.target.value))
+                      }
+                      className="accent-blue-500 w-5 h-5 cursor-pointer"
                     />
                   </td>
                 ))}
@@ -159,4 +120,4 @@ const Survey = () => {
   );
 };
 
-export default Survey;
+export default AbilitiesSurvey;
