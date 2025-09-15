@@ -247,3 +247,52 @@ export const skillMapping = {
   socialStatus: [4, 18, 24, 35, 38, 41, 43, 47, 61, 64, 66, 67, 68],
   situationalUnderstanding: [2, 3, 5, 9, 20, 46, 70],
 };
+
+export const personalAbilitiesQuestions = [
+  "I am skilled in using tools and equipment",
+  "I can determine my location and direction accurately",
+  "I have a high ability to resolve conflicts among colleagues",
+  "I can easily remember musical pieces",
+  "I can explain and clarify difficult topics",
+  "I always do things step by step",
+  "I know myself well and understand the reasons for my actions",
+  "I enjoy participating in social activities and events",
+  "I learn well by talking and listening to others",
+  "My mood changes when listening to music",
+  "I enjoy solving mazes, crosswords, and logical problems",
+  "Maps, charts, and visual presentations are important for me to learn well",
+  "I am highly sensitive to the emotions and feelings of others around me",
+  "I learn best through practical experience",
+  "To learn a specific skill, I must know how it will benefit me",
+  "I like quiet and privacy while working and thinking",
+  "I can distinguish musical instrument sounds in complex pieces",
+  "I can easily visualize scenes I have seen before",
+  "I can easily express verbally what I want",
+  "I enjoy writing notes about a topic",
+  "I have a high ability to maintain balance and coordination",
+  "I can recognize patterns and relationships between things I notice",
+  "I cooperate with others in a team and benefit from their ideas and expertise",
+  "I have high observation accuracy and notice things others don’t",
+  "I move quickly in multiple directions",
+  "I enjoy working or learning alone",
+  "I enjoy composing some musical pieces",
+  "I deal easily with numbers and mathematical problems",
+];
+
+export const intelligenceMapping = {
+  linguistic: [5, 9, 19, 20, 29],
+  musical: [4, 10, 17, 27, 30],
+  social: [3, 8, 13, 23, 31],
+  personal: [7, 15, 16, 26, 32],
+  bodily_kinesthetic: [1, 14, 21, 25, 34],
+  logical_mathematical: [6, 11, 22, 28, 35],
+  visual_spatial: [2, 12, 18, 24, 33],
+};
+
+export const abilityOptions = [
+  { value: 1, label: "Not at all" },
+  { value: 2, label: "A little" },
+  { value: 3, label: "Moderately" },
+  { value: 4, label: "Mostly" },
+  { value: 5, label: "Exactly" },
+];

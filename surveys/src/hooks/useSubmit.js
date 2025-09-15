@@ -3,7 +3,7 @@ import axios from "axios";
 
 const submitData = async (data) => {
   const response = await axios.post(
-    "https://survey-backend.up.railway.app/api/leadership",
+    "https://survey-backend.up.railway.app/api/personal-competency",
     data
   );
   return response.data;
