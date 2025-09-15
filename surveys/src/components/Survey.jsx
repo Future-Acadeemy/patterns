@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   leadershipQuestions,
   frequencyOptions,
@@ -6,13 +6,23 @@ import {
   skillMapping,
 } from "../data/Questions";
 import { useSurveyStore } from "../store/useSurveyStore";
+import useSubmit from "../hooks/useSubmit";
+import { useNavigate } from "react-router-dom";
 
 const Survey = () => {
   const { answers, setAnswer, setScores, getSurveyData, setShowResult } =
     useSurveyStore();
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+  const [validationError, setValidationError] = useState("");
+
+  const mutation = useSubmit();
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    const surveyData = getSurveyData();
 
     // ✅ Calculate scores inside the component (mutation here)
     const questionScores = Object.entries(answers).reduce(
@@ -33,7 +43,20 @@ const Survey = () => {
 
     setScores(skillScores);
     setShowResult(true);
+    // try {
+    //   await mutation.mutateAsync({
+    //     phone: surveyData.phone,
+    //     answers: surveyData.answers,
+    //     scores: surveyData.scores,
+    //   });
+    //   navigate("/report");
+    // } catch (error) {
+    //   setValidationError("Submission failed. Please try again.");
+    // }
 
+    console.log("data:--> ", getSurveyData());
+
+    navigate("/report");
     console.log("Survey Data:", getSurveyData());
   };
 
