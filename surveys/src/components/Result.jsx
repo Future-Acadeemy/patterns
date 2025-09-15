@@ -3,27 +3,12 @@ import { useSurveyStore } from "../store/useSurveyStore";
 import { useUserStore } from "../store/useUserStore";
 import { useTranslation } from "react-i18next";
 
-const interpretations = {
-  A: {
-    High: "Decision making skills",
-    Low: "Decision making skills",
-  },
-  B: {
-    High: "Communication Skills",
-    Low: "Communication Skills",
-  },
-  C: {
-    High: "Motivation Skills",
-    Low: "Motivation Skills",
-  },
-  D: {
-    High: "Conflict Management Skills",
-    Low: "Conflict Management Skills",
-  },
-  E: {
-    High: "Meeting Management Skills",
-    Low: "Meeting Management Skills",
-  },
+const sectionToSkill = {
+  A: "Decision Making Skills",
+  B: "Communication Skills",
+  C: "Motivation Skills",
+  D: "Conflict Management Skills",
+  E: "Meeting Management Skills",
 };
 
 const sectionColors = {
@@ -39,11 +24,6 @@ const Result = () => {
   const user = useUserStore((state) => state);
   const { t } = useTranslation();
 
-  const interpretScore = (section, score) => {
-    const level = score > 30 ? "High" : "Low";
-    return interpretations[section]?.[level] || "";
-  };
-
   return (
     <div className="p-6 bg-white shadow-xl rounded-2xl">
       <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">
@@ -55,13 +35,20 @@ const Result = () => {
             key={section}
             className={`p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition ${sectionColors[section]}`}
           >
+            {/* ✅ Show skill name instead of section letter */}
             <h3 className="font-bold text-lg mb-2">
-              {t("Section")} {t(section)}
+              {t(sectionToSkill[section])}
             </h3>
-            <p className="text-xs opacity-90 leading-relaxed">
-              {t(interpretScore(section, score))}
+
+            {/* ✅ Show interpretation (High/Low meaning) */}
+            <p className="text-xs opacity-90 leading-relaxed mb-2">
+              {level === "High"
+                ? t(`${sectionToSkill[section]} (Strong)`)
+                : t(`${sectionToSkill[section]} (Needs Improvement)`)}
             </p>
-            <p className="text-sm mb-1">
+
+            {/* ✅ Show score + level */}
+            <p className="text-sm">
               <span className="font-semibold">{t("Score")}:</span> {score} (
               {level})
             </p>
