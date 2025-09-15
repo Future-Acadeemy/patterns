@@ -1,139 +1,115 @@
-import React, { useEffect, useState } from "react";
-import Result from "./Result";
-import { questions } from "../data/Questions";
-import { options } from "../data/Questions";
+import React from "react";
+import {
+  leadershipQuestions,
+  frequencyOptions,
+  importanceOptions,
+  skillMapping,
+} from "../data/Questions";
 import { useSurveyStore } from "../store/useSurveyStore";
-import { useNavigate } from "react-router-dom";
-import { interpretations } from "../data/Questions";
-import { interpretScore } from "../services/Services";
-import { useUserStore } from "../store/useUserStore";
-import axios from "axios";
-import useSubmit from "../hooks/useSubmit";
-import { useTranslation } from "react-i18next";
 
 const Survey = () => {
-  const {
-    answers,
-    setAnswer,
-    showResult,
-    setShowResult,
-    scores,
-    updateScores,
-    getSurveyData,
-    setPhone,
-  } = useSurveyStore();
-  const navigate = useNavigate();
-  const { userInfo } = useUserStore();
-  const { t, i18n } = useTranslation();
+  const { answers, setAnswer, setScores, getSurveyData, setShowResult } =
+    useSurveyStore();
 
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
-  const [validationError, setValidationError] = useState("");
-
-  const mutation = useSubmit();
-  console.log("questions:: --> ", questions);
-
-  const scoresWithInterpretations = Object.entries(scores).reduce(
-    (acc, [section, { score, level }]) => {
-      acc[section] = {
-        score,
-        level,
-        interpretation: interpretScore(section, score),
-      };
-      return acc;
-    },
-    {}
-  );
-
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    updateScores();
-    const surveyData = getSurveyData();
 
-    try {
-      await mutation.mutateAsync({
-        phone: surveyData.phone,
-        answers: surveyData.answers,
-        scores: surveyData.scores,
-      });
-      navigate("/report");
-    } catch (error) {
-      setValidationError("Submission failed. Please try again.");
+    // ✅ Calculate scores inside the component (mutation here)
+    const questionScores = Object.entries(answers).reduce(
+      (acc, [id, { freq, imp }]) => {
+        acc[id] = (freq || 0) * (imp || 0);
+        return acc;
+      },
+      {}
+    );
+
+    const skillScores = {};
+    for (const [skill, ids] of Object.entries(skillMapping)) {
+      skillScores[skill] = ids.reduce(
+        (sum, id) => sum + (questionScores[id] || 0),
+        0
+      );
     }
 
-    console.log("data:--> ", getSurveyData());
+    setScores(skillScores);
+    setShowResult(true);
 
-    navigate("/report");
+    console.log("Survey Data:", getSurveyData());
   };
 
-  useEffect(() => {
-    setPhone(userInfo.phone);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   return (
-    <div className="w-full max-w-full mx-auto bg-white p-8 rounded-lg shadow-lg">
-      <form className="space-y-8" onSubmit={handleSubmit}>
-        {Object.entries(questions).map(([section, qs]) => (
-          <div key={section} className="p-6 bg-gray-50 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold mb-4 text-blue-600 text-center">
-              {t("Section")} {t(section)}
-            </h2>
-            <table className="w-full border-collapse border border-gray-300 text-left">
-              <thead>
-                <tr className="bg-blue-100">
-                  <th className="border border-gray-300 px-4 py-3 text-center">
-                    {t("Question")}
-                  </th>
-                  {options.map((option) => (
-                    <th
-                      key={option.value}
-                      className="border border-gray-300 px-4 py-3 text-center"
-                    >
-                      {t(option.label)}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {qs.map((q, index) => (
-                  <tr key={index} className="hover:bg-gray-100">
-                    <td className="border border-gray-300 px-4 py-3 text-center">
-                      {t(q)}
-                    </td>
-                    {options.map((option) => (
-                      <td
-                        key={option.value}
-                        className="border border-gray-300 px-4 py-3 text-center"
-                      >
-                        <input
-                          type="radio"
-                          name={`section-${section}-question-${index}`}
-                          value={option.value}
-                          checked={answers[section][index] === option?.value}
-                          onChange={(e) =>
-                            setAnswer(section, index, e.target.value)
-                          }
-                          required
-                        />
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ))}
-        <div className="flex justify-center mt-6">
-          <button
-            className="bg-blue-500 text-white px-6 py-3 rounded-lg text-lg font-semibold hover:bg-blue-600 transition"
-            type="submit"
-          >
-            Submit
-          </button>
-        </div>
-      </form>
-    </div>
+    <form onSubmit={handleSubmit} className="p-6 bg-white shadow-md rounded-lg">
+      <table className="w-full border border-gray-300">
+        <thead>
+          <tr className="bg-gray-100">
+            <th className="p-2 border">Question</th>
+            <th colSpan={3} className="p-2 border text-center">
+              Frequency
+            </th>
+            <th colSpan={3} className="p-2 border text-center">
+              Importance
+            </th>
+          </tr>
+          <tr className="bg-gray-50">
+            <th></th>
+            {frequencyOptions.map((opt) => (
+              <th key={`f-${opt.value}`} className="border p-1">
+                {opt.label}
+              </th>
+            ))}
+            {importanceOptions.map((opt) => (
+              <th key={`i-${opt.value}`} className="border p-1">
+                {opt.label}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {leadershipQuestions.map((q) => (
+            <tr key={q.id} className="hover:bg-gray-50">
+              <td className="border p-2">{q.text}</td>
+              {frequencyOptions.map((opt) => (
+                <td
+                  key={`freq-${q.id}-${opt.value}`}
+                  className="border text-center"
+                >
+                  <input
+                    type="radio"
+                    name={`freq-${q.id}`}
+                    value={opt.value}
+                    checked={answers[q.id]?.freq === opt.value}
+                    onChange={(e) => setAnswer(q.id, "freq", e.target.value)}
+                  />
+                </td>
+              ))}
+              {importanceOptions.map((opt) => (
+                <td
+                  key={`imp-${q.id}-${opt.value}`}
+                  className="border text-center"
+                >
+                  <input
+                    type="radio"
+                    name={`imp-${q.id}`}
+                    value={opt.value}
+                    checked={answers[q.id]?.imp === opt.value}
+                    onChange={(e) => setAnswer(q.id, "imp", e.target.value)}
+                  />
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      <div className="mt-6 text-center">
+        <button
+          type="submit"
+          className="px-6 py-2 bg-blue-500 text-white rounded-md"
+        >
+          Submit
+        </button>
+      </div>
+    </form>
   );
 };
 
