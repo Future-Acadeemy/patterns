@@ -5,8 +5,9 @@ import {
   importanceOptions,
 } from "../data/Questions";
 import { useSurveyStore } from "../store/useSurveyStore";
-import { useNavigate, useSubmit } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useUserStore } from "../store/useUserStore";
+import useSubmit from "../hooks/useSubmit";
 
 const Survey = () => {
   const { answers, setAnswer, calculateScores, setShowResult, getSurveyData } =
@@ -36,12 +37,12 @@ const Survey = () => {
     setShowResult(true);
 
     // --- If you want API submission ---
-    // try {
-    //   await mutation.mutateAsync(getSurveyData());
-    //   navigate("/report");
-    // } catch (error) {
-    //   setValidationError("Submission failed. Please try again.");
-    // }
+    try {
+      await mutation.mutateAsync(getSurveyData());
+      navigate("/report");
+    } catch (error) {
+      setValidationError("Submission failed. Please try again.");
+    }
 
     console.log("Survey Data:", getSurveyData());
 
