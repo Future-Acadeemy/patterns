@@ -50,16 +50,16 @@ const Survey = () => {
     updateScores();
     const surveyData = getSurveyData();
 
-    // try {
-    //   await mutation.mutateAsync({
-    //     phone: surveyData.phone,
-    //     answers: surveyData.answers,
-    //     scores: surveyData.scores,
-    //   });
-    //   navigate("/report");
-    // } catch (error) {
-    //   setValidationError("Submission failed. Please try again.");
-    // }
+    try {
+      await mutation.mutateAsync({
+        phone: surveyData.phone,
+        answers: surveyData.answers,
+        scores: surveyData.scores,
+      });
+      navigate("/report");
+    } catch (error) {
+      setValidationError("Submission failed. Please try again.");
+    }
 
     console.log("data:--> ", getSurveyData());
 
