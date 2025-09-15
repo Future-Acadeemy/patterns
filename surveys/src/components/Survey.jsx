@@ -1,64 +1,60 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   leadershipQuestions,
   frequencyOptions,
   importanceOptions,
-  skillMapping,
 } from "../data/Questions";
 import { useSurveyStore } from "../store/useSurveyStore";
 import useSubmit from "../hooks/useSubmit";
 import { useNavigate } from "react-router-dom";
+import { useUserStore } from "../store/useUserStore";
 
 const Survey = () => {
-  const { answers, setAnswer, setScores, getSurveyData, setShowResult } =
-    useSurveyStore();
+  const {
+    answers,
+    setAnswer,
+    calculateScores,
+    setPhone,
+    getSurveyData,
+    setShowResult,
+  } = useSurveyStore();
   const navigate = useNavigate();
+  const { userInfo } = useUserStore();
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [validationError, setValidationError] = useState("");
+  const [phoneInput, setPhoneInput] = useState("");
 
   const mutation = useSubmit();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const surveyData = getSurveyData();
 
-    // ✅ Calculate scores inside the component (mutation here)
-    const questionScores = Object.entries(answers).reduce(
-      (acc, [id, { freq, imp }]) => {
-        acc[id] = (freq || 0) * (imp || 0);
-        return acc;
-      },
-      {}
-    );
+    // ✅ Save phone number in store
+    setPhone(phoneInput);
 
-    const skillScores = {};
-    for (const [skill, ids] of Object.entries(skillMapping)) {
-      skillScores[skill] = ids.reduce(
-        (sum, id) => sum + (questionScores[id] || 0),
-        0
-      );
-    }
-
-    setScores(skillScores);
+    // ✅ Let the store calculate scores
+    calculateScores();
     setShowResult(true);
+
+    // --- If you want API submission ---
     // try {
-    //   await mutation.mutateAsync({
-    //     phone: surveyData.phone,
-    //     answers: surveyData.answers,
-    //     scores: surveyData.scores,
-    //   });
+    //   await mutation.mutateAsync(getSurveyData());
     //   navigate("/report");
     // } catch (error) {
     //   setValidationError("Submission failed. Please try again.");
     // }
 
-    console.log("data:--> ", getSurveyData());
+    console.log("Survey Data:", getSurveyData());
 
     navigate("/report");
-    console.log("Survey Data:", getSurveyData());
   };
+
+  useEffect(() => {
+    setPhone(userInfo.phone);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <form onSubmit={handleSubmit} className="p-6 bg-white shadow-md rounded-lg">
