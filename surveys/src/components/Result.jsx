@@ -5,24 +5,24 @@ import { useTranslation } from "react-i18next";
 
 const interpretations = {
   A: {
-    High: "Testifies to fatigue and decreased activity.",
-    Low: "Indicates vigor, energy, and strong health.",
+    High: "Decision making skills",
+    Low: "Decision making skills",
   },
   B: {
-    High: "Shows emotional exhaustion and stress at work.",
-    Low: "Reflects emotional balance and resilience.",
+    High: "Communication Skills",
+    Low: "Communication Skills",
   },
   C: {
-    High: "Indicates a decrease in the significance of one’s own personality, duties, and communication with others.",
-    Low: "Indicates a stable sense of responsibility and self-worth.",
+    High: "Motivation Skills",
+    Low: "Motivation Skills",
   },
   D: {
-    High: "Suggests feelings of depersonalization and detachment.",
-    Low: "Reflects healthy engagement and positive interaction.",
+    High: "Conflict Management Skills",
+    Low: "Conflict Management Skills",
   },
   E: {
-    High: "Demonstrates a reduced sense of personal accomplishment.",
-    Low: "Shows strong competence and effectiveness in work.",
+    High: "Meeting Management Skills",
+    Low: "Meeting Management Skills",
   },
 };
 
@@ -58,12 +58,12 @@ const Result = () => {
             <h3 className="font-bold text-lg mb-2">
               {t("Section")} {t(section)}
             </h3>
+            <p className="text-xs opacity-90 leading-relaxed">
+              {t(interpretScore(section, score))}
+            </p>
             <p className="text-sm mb-1">
               <span className="font-semibold">{t("Score")}:</span> {score} (
               {level})
-            </p>
-            <p className="text-xs opacity-90 leading-relaxed">
-              {t(interpretScore(section, score))}
             </p>
           </div>
         ))}
