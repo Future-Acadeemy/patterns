@@ -8,8 +8,10 @@ import { useSurveyStore } from "../store/useSurveyStore";
 import { useNavigate } from "react-router-dom";
 import { useUserStore } from "../store/useUserStore";
 import useSubmit from "../hooks/useSubmit";
+import { useTranslation } from "react-i18next";
 
 const Survey = () => {
+  const { t } = useTranslation(); // Translation hook
   const { answers, setAnswer, calculateScores, setShowResult, getSurveyData } =
     useSurveyStore();
   const navigate = useNavigate();
@@ -23,30 +25,22 @@ const Survey = () => {
   const mutation = useSubmit();
 
   useEffect(() => {
-    // optional: set phone from userInfo if needed in store
+    if (userInfo.phone) setPhoneInput(userInfo.phone);
   }, [userInfo.phone]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // ✅ Save phone number in store
-    if (phoneInput) setPhoneInput(phoneInput);
-
-    // ✅ Let the store calculate scores
     calculateScores();
     setShowResult(true);
 
-    // --- If you want API submission ---
     try {
       await mutation.mutateAsync(getSurveyData());
       navigate("/report");
     } catch (error) {
-      setValidationError("Submission failed. Please try again.");
+      setValidationError(t("Submission failed. Please try again."));
     }
 
     console.log("Survey Data:", getSurveyData());
-
-    navigate("/report");
   };
 
   return (
@@ -59,19 +53,19 @@ const Survey = () => {
           <thead>
             <tr>
               <th className="p-3 bg-blue-100 text-blue-700 font-semibold rounded-tl-xl border-b border-gray-200">
-                Question
+                {t("Question")}
               </th>
               <th
                 colSpan={3}
                 className="p-3 bg-blue-100 text-blue-700 font-semibold text-center border-b border-gray-200"
               >
-                Frequency
+                {t("Frequency")}
               </th>
               <th
                 colSpan={3}
                 className="p-3 bg-blue-100 text-blue-700 font-semibold text-center rounded-tr-xl border-b border-gray-200"
               >
-                Importance
+                {t("Importance")}
               </th>
             </tr>
             <tr className="bg-gray-50 text-gray-700">
@@ -85,7 +79,7 @@ const Survey = () => {
                       : ""
                   }`}
                 >
-                  {opt.label}
+                  {t(opt.label)}
                 </th>
               ))}
               {importanceOptions.map((opt) => (
@@ -93,7 +87,7 @@ const Survey = () => {
                   key={`i-${opt.value}`}
                   className="p-2 border-b border-gray-200 text-center font-medium"
                 >
-                  {opt.label}
+                  {t(opt.label)}
                 </th>
               ))}
             </tr>
@@ -107,7 +101,7 @@ const Survey = () => {
                 } hover:bg-blue-50 transition`}
               >
                 <td className="p-3 text-gray-800 font-medium border-b border-gray-200">
-                  {q.text}
+                  {t(q.text)}
                 </td>
                 {frequencyOptions.map((opt, idx) => (
                   <td
@@ -149,12 +143,16 @@ const Survey = () => {
         </table>
       </div>
 
+      {validationError && (
+        <p className="mt-4 text-red-500 text-center">{validationError}</p>
+      )}
+
       <div className="mt-8 text-center">
         <button
           type="submit"
           className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition font-medium"
         >
-          Submit
+          {t("Submit")}
         </button>
       </div>
     </form>
