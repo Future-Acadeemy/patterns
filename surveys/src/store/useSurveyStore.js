@@ -27,13 +27,24 @@ export const useSurveyStore = create(
               0
             );
 
-          return {
-            scores: {
-              A: calculateScore("A"),
-              B: calculateScore("B"),
-              C: calculateScore("C"),
-            },
+          const classifyScore = (score) => (score > 30 ? "High" : "Low");
+
+          const scores = {
+            A: calculateScore("A"),
+            B: calculateScore("B"),
+            C: calculateScore("C"),
+            D: calculateScore("D"),
+            E: calculateScore("E"),
           };
+
+          const results = Object.fromEntries(
+            Object.entries(scores).map(([section, score]) => [
+              section,
+              { score, level: classifyScore(score) },
+            ])
+          );
+
+          return { scores: results };
         }),
 
       getSurveyData: () => {

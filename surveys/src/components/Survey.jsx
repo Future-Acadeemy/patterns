@@ -34,9 +34,10 @@ const Survey = () => {
   console.log("questions:: --> ", questions);
 
   const scoresWithInterpretations = Object.entries(scores).reduce(
-    (acc, [section, score]) => {
+    (acc, [section, { score, level }]) => {
       acc[section] = {
         score,
+        level,
         interpretation: interpretScore(section, score),
       };
       return acc;
@@ -49,16 +50,16 @@ const Survey = () => {
     updateScores();
     const surveyData = getSurveyData();
 
-    try {
-      await mutation.mutateAsync({
-        phone: surveyData.phone,
-        answers: surveyData.answers,
-        scores: surveyData.scores,
-      });
-      navigate("/report");
-    } catch (error) {
-      setValidationError("Submission failed. Please try again.");
-    }
+    // try {
+    //   await mutation.mutateAsync({
+    //     phone: surveyData.phone,
+    //     answers: surveyData.answers,
+    //     scores: surveyData.scores,
+    //   });
+    //   navigate("/report");
+    // } catch (error) {
+    //   setValidationError("Submission failed. Please try again.");
+    // }
 
     console.log("data:--> ", getSurveyData());
 
