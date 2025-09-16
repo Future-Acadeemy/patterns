@@ -1,13 +1,13 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { intelligenceMapping } from "../data/Questions";
+import { skillMapping } from "../data/Questions";
 
 export const useSurveyStore = create(
   persist(
     (set, get) => ({
-      phone: "", // Add phone field
+      phone: "",
       answers: {}, // { [questionId]: value }
-      scores: {}, // { intelligence: { score: number, level: string } }
+      scores: {}, // { skill: { score, level } }
 
       setPhone: (phone) => set({ phone }),
 
@@ -18,18 +18,27 @@ export const useSurveyStore = create(
 
       calculateScores: () => {
         const { answers } = get();
-        const finalScores = {};
+        const skillScores = {};
 
-        for (const [intelligence, questionIds] of Object.entries(
-          intelligenceMapping
-        )) {
-          const total = questionIds.reduce(
-            (sum, qId) => sum + (answers[qId] || 0),
-            0
-          );
-          finalScores[intelligence] = {
+        // initialize skills with 0
+        ["التوجيه", "المساندة", "الرعاية", "التفويض"].forEach(
+          (skill) => (skillScores[skill] = 0)
+        );
+
+        // sum up scores for each skill
+        for (const [qId, value] of Object.entries(answers)) {
+          const skill = skillMapping[qId];
+          if (skill) {
+            skillScores[skill] += value;
+          }
+        }
+
+        // assign level based on threshold
+        const finalScores = {};
+        for (const [skill, total] of Object.entries(skillScores)) {
+          finalScores[skill] = {
             score: total,
-            level: total > 15 ? "High" : "Low", // You can adjust threshold
+            level: total >= 36 ? "Strong" : "Needs Improvement",
           };
         }
 
@@ -42,7 +51,7 @@ export const useSurveyStore = create(
       },
     }),
     {
-      name: "personal-abilities-survey",
+      name: "leadership-abilities-survey",
       getStorage: () => localStorage,
     }
   )
