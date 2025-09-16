@@ -2,24 +2,11 @@ import React from "react";
 import { useSurveyStore } from "../store/useSurveyStore";
 import { useTranslation } from "react-i18next";
 
-const sectionToSkill = {
-  linguistic: "Linguistic Skills",
-  musical: "Musical Skills",
-  social: "Social Skills",
-  personal: "Personal Skills",
-  bodily_kinesthetic: "Bodily-Kinesthetic Skills",
-  logical_mathematical: "Logical-Mathematical Skills",
-  visual_spatial: "Visual-Spatial Skills",
-};
-
-const sectionColors = {
-  linguistic: "bg-blue-50 text-blue-800",
-  musical: "bg-green-50 text-green-800",
-  social: "bg-yellow-50 text-yellow-800",
-  personal: "bg-purple-50 text-purple-800",
-  bodily_kinesthetic: "bg-pink-50 text-pink-800",
-  logical_mathematical: "bg-indigo-50 text-indigo-800",
-  visual_spatial: "bg-teal-50 text-teal-800",
+const skillColors = {
+  التوجيه: "bg-blue-50 text-blue-800",
+  المساندة: "bg-green-50 text-green-800",
+  الرعاية: "bg-yellow-50 text-yellow-800",
+  التفويض: "bg-purple-50 text-purple-800",
 };
 
 const Result = () => {
@@ -27,52 +14,34 @@ const Result = () => {
   const { t } = useTranslation();
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className="p-6 max-w-7xl mx-auto" dir="rtl">
       <h2 className="text-3xl font-bold mb-8 text-blue-800 text-center">
-        {t("Your Survey Results")}
+        {t("نتائج مقياس الانماط القيادية")}
       </h2>
 
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {Object.entries(scores).map(([section, { score, level }]) => (
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {Object.entries(scores).map(([skill, { score, level }]) => (
           <div
-            key={section}
-            className={`p-5 rounded-2xl border border-gray-200 shadow-md hover:shadow-xl transition flex flex-col justify-between ${sectionColors[section]}`}
+            key={skill}
+            className={`p-5 rounded-2xl border border-gray-200 shadow-md hover:shadow-xl transition flex flex-col justify-between ${skillColors[skill]}`}
           >
-            {/* Skill Name */}
-            <h3 className="font-bold text-lg mb-3">
-              {t(sectionToSkill[section])}
-            </h3>
+            {/* Skill name */}
+            <h3 className="font-bold text-lg mb-3">{t(skill)}</h3>
 
-            {/* Level Badge */}
+            {/* Level badge */}
             <span
               className={`inline-block px-3 py-1 text-sm font-semibold rounded-full mb-4 ${
-                level === "High"
+                level === "Strong"
                   ? "bg-green-200 text-green-800"
                   : "bg-red-200 text-red-800"
               }`}
             >
-              {level === "High" ? t("Strong") : t("Needs Improvement")}
+              {level === "Strong" ? t("قوي") : t("يحتاج إلى تحسين")}
             </span>
 
-            {/* Score Info */}
+            {/* Score */}
             <p className="text-gray-700 text-sm">
-              <span className="font-semibold">{t("Score")}:</span> {score} /{" "}
-              {Object.keys(sectionToSkill).length * 5}
-            </p>
-
-            {/* Optional Explanation */}
-            <p className="text-xs text-gray-600 mt-2 leading-relaxed">
-              {level === "High"
-                ? t(
-                    `You have a strong ${sectionToSkill[
-                      section
-                    ].toLowerCase()}.`
-                  )
-                : t(
-                    `You can improve your ${sectionToSkill[
-                      section
-                    ].toLowerCase()}.`
-                  )}
+              <span className="font-semibold">{t("الدرجة")}:</span> {score}
             </p>
           </div>
         ))}

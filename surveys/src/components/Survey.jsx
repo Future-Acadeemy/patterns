@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { personalAbilitiesQuestions, abilityOptions } from "../data/Questions";
 import { useSurveyStore } from "../store/useSurveyStore";
 import { useNavigate } from "react-router-dom";
 import { useUserStore } from "../store/useUserStore";
 import useSubmit from "../hooks/useSubmit";
 import { useTranslation } from "react-i18next";
+import { situations, abilityOptions } from "../data/Questions";
 
 const AbilitiesSurvey = () => {
   const { t } = useTranslation();
@@ -18,11 +18,9 @@ const AbilitiesSurvey = () => {
   } = useSurveyStore();
   const navigate = useNavigate();
   const { userInfo } = useUserStore();
-
   const [validationError, setValidationError] = useState("");
   const mutation = useSubmit();
 
-  // Initialize phone input from user info
   useEffect(() => {
     if (userInfo.phone) setPhone(userInfo.phone);
   }, [userInfo.phone, setPhone]);
@@ -50,59 +48,68 @@ const AbilitiesSurvey = () => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="p-6 bg-white shadow-lg rounded-3xl max-w-6xl mx-auto"
+      className="p-6 bg-white shadow-lg rounded-3xl max-w-6xl mx-auto space-y-10"
+      dir="rtl"
     >
-      {/* Survey Table */}
-      <div className="overflow-x-auto">
-        <table className="w-full border-separate border-spacing-0">
-          <thead>
-            <tr>
-              <th className="p-3 bg-blue-100 text-blue-700 font-semibold rounded-tl-xl border-b border-gray-200">
-                {t("Question")}
-              </th>
-              {abilityOptions.map((opt) => (
-                <th
-                  key={opt.value}
-                  className="p-3 bg-blue-100 text-blue-700 font-semibold text-center border-b border-gray-200"
-                >
-                  {t(opt.label)}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {personalAbilitiesQuestions.map((q, index) => (
-              <tr
-                key={index + 1}
-                className={`${
-                  index % 2 === 0 ? "bg-white" : "bg-gray-50"
-                } hover:bg-blue-50 transition`}
-              >
-                <td className="p-3 text-gray-800 font-medium border-b border-gray-200">
-                  {t(`${index + 1}. ${q}`)}
-                </td>
-                {abilityOptions.map((opt) => (
-                  <td
-                    key={`q${index + 1}-opt${opt.value}`}
-                    className="p-2 text-center border-b border-gray-200"
+      {situations.map((situation) => (
+        <div key={situation.id} className="mb-12">
+          <h2 className="text-xl font-bold mb-4">{t(situation.text)}</h2>
+          <div className="overflow-x-auto">
+            <table className="w-full border-separate border-spacing-0 mb-12">
+              <thead>
+                <tr>
+                  <th className="p-3 bg-blue-100 text-blue-700 font-semibold rounded-tl-xl border-b border-gray-200 mb-40 mt-40">
+                    {t("الأسلوب الذى أستخدمه في هذا الموقف")}
+                  </th>
+                  {abilityOptions.map((opt) => (
+                    <th
+                      key={opt.value}
+                      className="p-3 bg-blue-100 text-blue-700 font-semibold text-center border-b border-gray-200"
+                    >
+                      {t(opt.label)}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {situation.options.map((option) => (
+                  <tr
+                    key={option.key}
+                    className="bg-white hover:bg-blue-50 transition"
                   >
-                    <input
-                      type="radio"
-                      name={`q${index + 1}`}
-                      value={opt.value}
-                      checked={answers[index + 1] === opt.value}
-                      onChange={(e) =>
-                        setAnswer(index + 1, Number(e.target.value))
-                      }
-                      className="accent-blue-500 w-5 h-5 cursor-pointer"
-                    />
-                  </td>
+                    <td className="p-3 text-gray-800 font-medium border-b border-gray-200">
+                      {t(`${option.key} – ${option.label}`)}
+                    </td>
+                    {abilityOptions.map((opt) => (
+                      <td
+                        key={`s${situation.id}-${option.key}-opt${opt.value}`}
+                        className="p-2 text-center border-b border-gray-200"
+                      >
+                        <input
+                          type="radio"
+                          name={`s${situation.id}-${option.key}`}
+                          value={opt.value}
+                          checked={
+                            answers[`s${situation.id}-${option.key}`] ===
+                            opt.value
+                          }
+                          onChange={(e) =>
+                            setAnswer(
+                              `s${situation.id}-${option.key}`,
+                              Number(e.target.value)
+                            )
+                          }
+                          className="accent-blue-500 w-5 h-5 cursor-pointer"
+                        />
+                      </td>
+                    ))}
+                  </tr>
                 ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ))}
 
       {validationError && (
         <p className="mt-4 text-red-500 text-center">{validationError}</p>
